@@ -1,22 +1,27 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.controller;
 
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.dto.MemberDto;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.dto.RegisterMemberCommand;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.entity.Member;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.service.MemberReadService;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping
 public class MemberController {
     private final MemberWriteService memberWriteService;
+    private final MemberReadService memberReadService;
 
     @PostMapping("/members")
-    public Member register(@RequestBody RegisterMemberCommand command) {
+    public MemberDto register(@RequestBody RegisterMemberCommand command) {
         return memberWriteService.register(command);
+    }
+
+    @GetMapping("/members/{id}")
+    public MemberDto getMember(@PathVariable Long id) {
+        return memberReadService.getMember(id);
     }
 }

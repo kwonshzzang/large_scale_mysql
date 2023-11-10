@@ -1,5 +1,6 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.service;
 
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.dto.MemberDto;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.dto.RegisterMemberCommand;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.entity.Member;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.repository.MemberRepository;
@@ -10,8 +11,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberWriteService {
     private final MemberRepository memberRepository;
+    private final MemberReadService memberReadService;
 
-    public Member register(RegisterMemberCommand command) {
+    public MemberDto register(RegisterMemberCommand command) {
         /**
          * Goal - 회원정보(이메일, 닉네임, 생년월일)를 등록
          *      - 닉네임은 10자를 넘길 수 없다.
@@ -26,6 +28,6 @@ public class MemberWriteService {
                 .birthday(command.birthday())
                 .build();
 
-       return memberRepository.save(member);
+       return memberReadService.toDto(memberRepository.save(member));
     }
 }
