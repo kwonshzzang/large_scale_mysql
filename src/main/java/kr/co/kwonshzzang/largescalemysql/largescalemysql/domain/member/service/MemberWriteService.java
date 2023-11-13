@@ -3,6 +3,8 @@ package kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.service;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.dto.MemberDto;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.dto.RegisterMemberCommand;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.entity.Member;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.entity.MemberNicknameHistory;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.repository.MemberNicknameHistoryRepository;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class MemberWriteService {
     private final MemberRepository memberRepository;
     private final MemberReadService memberReadService;
+    private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
 
     public MemberDto register(RegisterMemberCommand command) {
         /**
@@ -27,7 +30,30 @@ public class MemberWriteService {
                 .email(command.email())
                 .birthday(command.birthday())
                 .build();
+        var savedMember = memberRepository.save(member);
+        saveNicknameHistory(savedMember);
 
-       return memberReadService.toDto(memberRepository.save(member));
+       return memberReadService.toDto(savedMember);
+    }
+
+    public void changeNickname(Long memberId, String nickname) {
+        /**
+         * 1. 회원 이름을 변경
+         * 2. 변경 내역을 저장한다.
+         */
+        var member = memberRepository.findById(memberId).orElseThrow();
+        member.changeNickname(nickname);
+        memberRepository.save(member);
+
+        saveNicknameHistory(member);
+    }
+
+    private void saveNicknameHistory(Member member) {
+        var history = MemberNicknameHistory.builder()
+                .memberId(member.getId())
+                .nickname(member.getNickname())
+                .build();
+
+        memberNicknameHistoryRepository.save(history);
     }
 }
