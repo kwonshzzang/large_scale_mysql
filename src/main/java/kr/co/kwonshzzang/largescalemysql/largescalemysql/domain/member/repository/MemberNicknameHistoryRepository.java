@@ -32,7 +32,7 @@ public class MemberNicknameHistoryRepository {
         if(memberNicknameHistory.getId() == null) {
             return insert(memberNicknameHistory);
         }
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("닉네임 히스토리는 갱신을 지원하지 않습니다.");
     }
 
     private MemberNicknameHistory insert(MemberNicknameHistory memberNicknameHistory) {

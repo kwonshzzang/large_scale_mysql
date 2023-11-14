@@ -1,4 +1,4 @@
-package kr.co.kwonshzzang.largescalemysql.largescalemysql.controller;
+package kr.co.kwonshzzang.largescalemysql.largescalemysql.application.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
