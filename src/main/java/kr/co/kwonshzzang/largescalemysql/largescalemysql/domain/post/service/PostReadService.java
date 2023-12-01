@@ -6,6 +6,8 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.PostDto
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.entity.Post;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,12 @@ public class PostReadService {
          **/
         return postRepository.groupByCreatedDate(request);
     }
+
+    public Page<Post> getPosts(Long memberId, Pageable pageable) {
+        return postRepository.findAllByMemberId(memberId, pageable);
+    }
+
+
 
     public PostDto toDto(Post post) {
         return new PostDto(post.getMemberId(), post.getContents(), post.getCreatedDate());

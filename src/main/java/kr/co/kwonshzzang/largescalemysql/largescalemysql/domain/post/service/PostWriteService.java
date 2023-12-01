@@ -16,7 +16,7 @@ public class PostWriteService {
     public PostDto register(RegisterPostCommand command) {
         var post = Post.builder()
                 .memberId(command.memberId())
-                .content(command.contents())
+                .contents(command.contents())
                 .build();
         var savedPost = postRepository.save(post);
 
