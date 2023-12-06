@@ -7,6 +7,8 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.Registe
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.entity.Post;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.service.PostReadService;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.service.PostWriteService;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.CursorRequest;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.PageCursor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,5 +42,13 @@ public class PostController {
             Pageable pageable
     ) {
         return postReadService.getPosts(memberId, pageable);
+    }
+
+    @GetMapping("/members/{memberId}/by-cursor")
+    public PageCursor<Post> getPostsByCursor(
+            @PathVariable(name = "memberId") Long memberId,
+            CursorRequest cursorRequest
+    ) {
+        return postReadService.getPosts(memberId, cursorRequest);
     }
 }

@@ -5,6 +5,8 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPo
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.PostDto;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.entity.Post;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository.PostRepository;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.CursorRequest;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.PageCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,22 @@ public class PostReadService {
         return postRepository.findAllByMemberId(memberId, pageable);
     }
 
+    public PageCursor<Post> getPosts(Long memberId, CursorRequest cursorRequest) {
+        List<Post> posts = findAllBy(memberId, cursorRequest);
+
+        var nextKey = posts.stream()
+                .mapToLong(Post::getId).min().orElse(CursorRequest.NONE_KEY);
+
+        return new PageCursor<>(cursorRequest.next(nextKey), posts);
+    }
+
+    private List<Post> findAllBy(Long memberId, CursorRequest cursorRequest) {
+        if(cursorRequest.hasKey()) {
+           return postRepository.findAllByMemberLessThanIdAndOrderByIdDesc(cursorRequest.key(), memberId, cursorRequest.size());
+        } else {
+           return postRepository.findAllByMemberIdAndOrderByIdDesc(memberId, cursorRequest.size());
+        }
+    }
 
 
     public PostDto toDto(Post post) {

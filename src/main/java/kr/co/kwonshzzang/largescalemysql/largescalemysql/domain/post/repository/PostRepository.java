@@ -1,7 +1,7 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository;
 
 
-import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.PageHelper;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.PageHelper;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountRequest;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountResponse;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.entity.Post;
@@ -82,6 +82,40 @@ public class PostRepository {
         var posts = namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
 
         return new PageImpl<>(posts, pageable, getCount(memberId));
+    }
+
+    public List<Post> findAllByMemberIdAndOrderByIdDesc(Long memberId, int size) {
+        var sql = String.format("""
+                SELECT *
+                FROM %s
+                WHERE memberId = :memberId
+                ORDER BY ID DESC
+                LIMIT :size
+                """, TABLE);
+
+        var params = new MapSqlParameterSource()
+                .addValue("memberId", memberId)
+                .addValue("size", size);
+
+        return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
+    }
+
+    public List<Post> findAllByMemberLessThanIdAndOrderByIdDesc(Long id, Long memberId, int size) {
+        var sql = String.format("""
+                SELECT *
+                FROM %s
+                WHERE memberId = :memberId
+                AND id < :id
+                ORDER BY ID DESC
+                LIMIT :size
+                """, TABLE);
+
+        var params = new MapSqlParameterSource()
+                .addValue("memberId", memberId)
+                .addValue("id", id)
+                .addValue("size", size);
+
+        return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
     }
 
     public List<DailyPostCountResponse> groupByCreatedDate(DailyPostCountRequest request) {

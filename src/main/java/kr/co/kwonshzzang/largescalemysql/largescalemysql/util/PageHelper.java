@@ -1,4 +1,4 @@
-package kr.co.kwonshzzang.largescalemysql.largescalemysql.domain;
+package kr.co.kwonshzzang.largescalemysql.largescalemysql.util;
 
 import org.springframework.data.domain.Sort;
 
@@ -8,16 +8,10 @@ public class PageHelper {
             return "id DESC";
         }
 
-
-        System.out.println(sort);
-
-
         var orderBys = sort.stream()
                 .map(order -> order.getProperty() + " " + order.getDirection())
                 .toList();
 
-
-        String v = String.join(", " , orderBys);
 
         return String.join(", " , orderBys);
     }
