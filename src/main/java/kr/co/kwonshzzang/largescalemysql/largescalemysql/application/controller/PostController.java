@@ -1,5 +1,6 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.application.controller;
 
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.application.usecase.GetTimelinePostsUsecase;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountRequest;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountResponse;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.PostDto;
@@ -24,6 +25,8 @@ import java.util.List;
 public class PostController {
     private final PostWriteService postWriteService;
     private final PostReadService postReadService;
+    private final GetTimelinePostsUsecase getTimelinePostsUsecase;
+
 
     @PostMapping("")
     public PostDto register(RegisterPostCommand command) {
@@ -50,5 +53,13 @@ public class PostController {
             CursorRequest cursorRequest
     ) {
         return postReadService.getPosts(memberId, cursorRequest);
+    }
+
+    @GetMapping("/members/{memberId}/timeline")
+    public PageCursor<Post> getPostsTimeline(
+            @PathVariable(name = "memberId") Long memberId,
+            CursorRequest cursorRequest
+    ) {
+        return getTimelinePostsUsecase.execute(memberId, cursorRequest);
     }
 }
