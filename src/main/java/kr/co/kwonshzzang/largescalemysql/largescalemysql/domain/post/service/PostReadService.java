@@ -50,8 +50,12 @@ public class PostReadService {
         return new PageCursor<>(cursorRequest.next(nextKey), posts);
     }
 
+    public List<Post> getPosts(List<Long> ids) {
+        return postRepository.findAllByIds(ids);
+    }
+
     public PostDto toDto(Post post) {
-        return new PostDto(post.getMemberId(), post.getContents(), post.getCreatedDate());
+        return new PostDto(post.getId(), post.getMemberId(), post.getContents(), post.getCreatedDate());
     }
 
 
