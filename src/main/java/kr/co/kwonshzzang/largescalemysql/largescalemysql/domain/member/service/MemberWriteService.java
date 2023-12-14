@@ -8,6 +8,8 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.repositor
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,7 @@ public class MemberWriteService {
     private final MemberReadService memberReadService;
     private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
 
+    @Transactional
     public MemberDto register(RegisterMemberCommand command) {
         /**
          * Goal - 회원정보(이메일, 닉네임, 생년월일)를 등록
@@ -31,11 +34,13 @@ public class MemberWriteService {
                 .birthday(command.birthday())
                 .build();
         var savedMember = memberRepository.save(member);
+
         saveNicknameHistory(savedMember);
 
        return memberReadService.toDto(savedMember);
     }
 
+    @Transactional
     public void changeNickname(Long memberId, String nickname) {
         /**
          * 1. 회원 이름을 변경

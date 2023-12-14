@@ -9,6 +9,8 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.service.Pos
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.service.TimelineWriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @RequiredArgsConstructor
 @Service
 public class CreatePostUsecase {
@@ -16,8 +18,10 @@ public class CreatePostUsecase {
     private final FollowReadService followReadService;
     private final TimelineWriteService timelineWriteService;
 
+//    @Transactional  //고민
     public PostDto execute(RegisterPostCommand command) {
         var postDto = postWriteService.register(command);
+
         var followerIds = followReadService.getFollowers(command.memberId())
                 .stream()
                 .map(FollowDto::fromMemberId).toList();
