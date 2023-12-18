@@ -6,6 +6,7 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.entity.Post
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -21,5 +22,12 @@ public class PostWriteService {
         var savedPost = postRepository.save(post);
 
         return postReadService.toDto(savedPost);
+    }
+
+    @Transactional
+    public void likePost(Long id) {
+        var post = postRepository.findById(id, true).orElseThrow(RuntimeException::new);
+        post.incrementLikeCount();
+        postRepository.save(post);
     }
 }

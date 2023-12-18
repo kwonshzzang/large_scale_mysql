@@ -55,7 +55,7 @@ public class PostReadService {
     }
 
     public PostDto toDto(Post post) {
-        return new PostDto(post.getId(), post.getMemberId(), post.getContents(), post.getCreatedDate());
+        return new PostDto(post.getId(), post.getMemberId(), post.getContents(), post.getLikeCount(), post.getCreatedDate());
     }
 
 

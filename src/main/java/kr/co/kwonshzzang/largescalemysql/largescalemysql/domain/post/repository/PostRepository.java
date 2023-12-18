@@ -1,6 +1,7 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository;
 
 
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.member.entity.Member;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.PageHelper;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountRequest;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountResponse;
@@ -21,6 +22,7 @@ import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -34,6 +36,7 @@ public class PostRepository {
                     .id(rs.getLong("id"))
                     .memberId(rs.getLong("memberId"))
                     .contents(rs.getString("contents"))
+                    .likeCount(rs.getLong("likeCount"))
                     .createdDate(rs.getObject("createdDate", LocalDate.class))
                     .createdAt(rs.getObject("createdAt", LocalDateTime.class))
                     .build();
@@ -48,7 +51,7 @@ public class PostRepository {
     public Post save(Post post) {
         if(post.getId() == null)
             return insert(post);
-        throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다.");
+        return update(post);
     }
 
     public void bulkInsert(List<Post> posts) {
@@ -62,6 +65,22 @@ public class PostRepository {
                 .map(BeanPropertySqlParameterSource::new)
                 .toArray(SqlParameterSource[]::new);
         namedParameterJdbcTemplate.batchUpdate(sql, params);
+    }
+
+    public Optional<Post> findById(Long id, Boolean requiredLock) {
+        var sql = String.format("""
+                SELECT *
+                FROM %s
+                WHERE id = :id
+                """, TABLE);
+        if(requiredLock) {
+            sql += "FOR UPDATE";
+        }
+        var params = new MapSqlParameterSource()
+                .addValue("id", id);
+
+        var post =  namedParameterJdbcTemplate.queryForObject(sql, params, POST_ROW_MAPPER);
+        return Optional.ofNullable(post);
     }
 
     public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
@@ -203,6 +222,14 @@ public class PostRepository {
                 .createdDate(post.getCreatedDate())
                 .createdAt(post.getCreatedAt())
                 .build();
+    }
+
+    private Post update(Post post) {
+        var sql = String.format("UPDATE %s SET memberId = :memberId, contents = :contents, " +
+                " likeCount = :likeCount, createdDate = :createdDate, createdAt = :createdAt WHERE id = :id", TABLE);
+        SqlParameterSource params = new BeanPropertySqlParameterSource(post);
+        namedParameterJdbcTemplate.update(sql, params);
+        return post;
     }
 
     private Long getCount(Long memberId) {
