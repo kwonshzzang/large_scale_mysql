@@ -4,6 +4,7 @@ import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPo
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountResponse;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.PostDto;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.entity.Post;
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository.PostLikeRepository;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.repository.PostRepository;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.CursorRequest;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.util.PageCursor;
@@ -13,11 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PostReadService {
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
 
     public List<DailyPostCountResponse> getDailyPostCount(DailyPostCountRequest request) {
         /**
@@ -30,8 +33,12 @@ public class PostReadService {
         return postRepository.groupByCreatedDate(request);
     }
 
-    public Page<Post> getPosts(Long memberId, Pageable pageable) {
-        return postRepository.findAllByMemberId(memberId, pageable);
+    public Post getPost(Long postId) {
+        return postRepository.findById(postId, false).orElseThrow(RuntimeException::new);
+    }
+
+    public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
+        return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
     }
 
     public PageCursor<Post> getPosts(Long memberId, CursorRequest cursorRequest) {
@@ -55,7 +62,7 @@ public class PostReadService {
     }
 
     public PostDto toDto(Post post) {
-        return new PostDto(post.getId(), post.getMemberId(), post.getContents(), post.getLikeCount(), post.getVersion(), post.getCreatedDate());
+        return new PostDto(post.getId(), post.getMemberId(), post.getContents(), postLikeRepository.getCount(post.getId()), post.getVersion(), post.getCreatedDate(), post.getCreatedAt());
     }
 
 

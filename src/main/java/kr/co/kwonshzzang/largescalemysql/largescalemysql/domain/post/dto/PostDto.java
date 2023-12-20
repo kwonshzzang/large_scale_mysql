@@ -1,6 +1,7 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record PostDto(
         Long id,
@@ -8,6 +9,7 @@ public record PostDto(
         String contents,
         Long likeCount,
         Long version,
-        LocalDate createdDate
+        LocalDate createdDate,
+        LocalDateTime createdAt
 ) {
 }

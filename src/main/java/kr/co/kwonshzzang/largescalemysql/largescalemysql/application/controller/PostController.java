@@ -1,5 +1,6 @@
 package kr.co.kwonshzzang.largescalemysql.largescalemysql.application.controller;
 
+import kr.co.kwonshzzang.largescalemysql.largescalemysql.application.usecase.CreatePostLikeUsecase;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.application.usecase.CreatePostUsecase;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.application.usecase.GetTimelinePostsUsecase;
 import kr.co.kwonshzzang.largescalemysql.largescalemysql.domain.post.dto.DailyPostCountRequest;
@@ -28,6 +29,7 @@ public class PostController {
     private final PostReadService postReadService;
     private final GetTimelinePostsUsecase getTimelinePostsUsecase;
     private final CreatePostUsecase createPostUsecase;
+    private final CreatePostLikeUsecase createPostLikeUsecase;
 
 
     @PostMapping("")
@@ -42,7 +44,7 @@ public class PostController {
     }
 
     @GetMapping("/members/{memberId}")
-    public Page<Post> getPosts(
+    public Page<PostDto> getPosts(
             @PathVariable(name = "memberId") Long memberId,
             Pageable pageable
     ) {
@@ -65,10 +67,16 @@ public class PostController {
         return getTimelinePostsUsecase.executeByTimeline(memberId, cursorRequest);
     }
 
-    @PutMapping("/{id}/like")
-    public void likePost(@PathVariable(name = "id") Long id) {
+    @PutMapping("/{id}/like/v1")
+    public void likePostV1(@PathVariable(name = "id") Long id) {
       //  postWriteService.likePost(id); //Positive Lock
         postWriteService.likePostByOptimisticLock(id); //Optimistic Lock
+    }
+
+    @PutMapping("/{id}/like/v2")
+    public void likePostV2(@PathVariable(name = "id") Long id, @RequestParam(name ="memberId") Long memberId) {
+        //  postWriteService.likePost(id); //Positive Lock
+        createPostLikeUsecase.execute(id, memberId); //Optimistic Lock
     }
 
 
